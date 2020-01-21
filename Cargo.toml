@@ -3,6 +3,8 @@ name = "dass"
 version = "0.1.0"
 authors = ["Guy John <guy@rumblesan.com>"]
 edition = "2018"
+description = "A helper library for creating recursive descent parsers"
+license = "BSD-3-Clause"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
