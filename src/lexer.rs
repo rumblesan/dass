@@ -1,66 +1,17 @@
-use regex::Regex;
-use std::fmt::{Debug, Display};
+use std::fmt::Display;
 
 use super::position_tracker::PositionTracker;
 use super::tokens::{TokenData, TokenMatcher};
 
-pub type Token = TokenData<TokenTag>;
-
-#[derive(Debug, Clone)]
-pub enum TokenTag {
-    End,
-    WhiteSpace,
-    OpenParen,
-    CloseParen,
-    OpenBrace,
-    CloseBrace,
-    OpenBracket,
-    CloseBracket,
-    SemiColon,
-    Comma,
-    Assignment,
-    Operator,
-    Float,
-    Integer,
-    Number,
-    Identifier,
+pub struct MeansLexer<T: Clone + Display> {
+    matchers: Vec<TokenMatcher<T>>,
 }
 
-pub struct MeansLexer {
-    matchers: Vec<TokenMatcher<TokenTag>>,
-}
-
-impl Display for TokenTag {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        Debug::fmt(self, f)
+impl<T: Clone + Display> MeansLexer<T> {
+    pub fn create(matchers: Vec<TokenMatcher<T>>) -> MeansLexer<T> {
+        MeansLexer { matchers }
     }
-}
-
-impl MeansLexer {
-    pub fn create() -> MeansLexer {
-        MeansLexer {
-            matchers: vec![
-                TokenMatcher::whitespace_with_newlines(TokenTag::WhiteSpace),
-                TokenMatcher::constant("(", TokenTag::OpenParen),
-                TokenMatcher::constant(")", TokenTag::CloseParen),
-                TokenMatcher::constant("{", TokenTag::OpenBrace),
-                TokenMatcher::constant("}", TokenTag::CloseBrace),
-                TokenMatcher::constant("[", TokenTag::OpenBracket),
-                TokenMatcher::constant("]", TokenTag::CloseBracket),
-                TokenMatcher::constant(";", TokenTag::SemiColon),
-                TokenMatcher::constant("=", TokenTag::Assignment),
-                TokenMatcher::constant(",", TokenTag::Comma),
-                TokenMatcher::operators("+-*/%", TokenTag::Operator),
-                TokenMatcher::float(TokenTag::Float),
-                TokenMatcher::integer(TokenTag::Integer),
-                TokenMatcher::regex(
-                    Regex::new(r"^[[:alpha:]][[:alnum:]]*").unwrap(),
-                    TokenTag::Identifier,
-                ),
-            ],
-        }
-    }
-    pub fn tokenise(&self, input: &str) -> Vec<Token> {
+    pub fn tokenise(&self, input: &str) -> Vec<TokenData<T>> {
         let mut tracker = PositionTracker::new();
         let mut source = input;
         let mut tokens = Vec::new();
