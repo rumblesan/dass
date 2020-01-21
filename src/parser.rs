@@ -10,13 +10,13 @@ pub enum ParserError<T: Clone + Display + Eq> {
     UnexpectedToken { expected: T, found: TokenData<T> },
 }
 
-pub struct MeansParser<T: Clone + Display + Eq> {
+pub struct DassParser<T: Clone + Display + Eq> {
     tokens: Vec<TokenData<T>>,
 }
 
-impl<T: Clone + Display + Eq> MeansParser<T> {
-    pub fn new(tokens: Vec<TokenData<T>>) -> MeansParser<T> {
-        MeansParser { tokens }
+impl<T: Clone + Display + Eq> DassParser<T> {
+    pub fn new(tokens: Vec<TokenData<T>>) -> DassParser<T> {
+        DassParser { tokens }
     }
     pub fn eof(&self) -> bool {
         self.tokens.len() == 0

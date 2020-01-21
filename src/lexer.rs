@@ -3,13 +3,13 @@ use std::fmt::Display;
 use super::position_tracker::PositionTracker;
 use super::tokens::{TokenData, TokenMatcher};
 
-pub struct MeansLexer<T: Clone + Display> {
+pub struct DassLexer<T: Clone + Display> {
     matchers: Vec<TokenMatcher<T>>,
 }
 
-impl<T: Clone + Display> MeansLexer<T> {
-    pub fn create(matchers: Vec<TokenMatcher<T>>) -> MeansLexer<T> {
-        MeansLexer { matchers }
+impl<T: Clone + Display> DassLexer<T> {
+    pub fn create(matchers: Vec<TokenMatcher<T>>) -> DassLexer<T> {
+        DassLexer { matchers }
     }
     pub fn tokenise(&self, input: &str) -> Vec<TokenData<T>> {
         let mut tracker = PositionTracker::new();
