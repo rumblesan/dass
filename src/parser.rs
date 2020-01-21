@@ -40,7 +40,10 @@ impl<T: Clone + Display + Eq> DassParser<T> {
         }
         Ok(t)
     }
-    pub fn pop_token(&mut self) -> Option<TokenData<T>> {
-        self.tokens.pop()
+    pub fn pop_token(&mut self) -> Result<TokenData<T>, ParserError<T>> {
+        match self.tokens.pop() {
+            Some(t) => Ok(t),
+            None => Err(ParserError::UnexpectedEndOfStream),
+        }
     }
 }
