@@ -29,17 +29,19 @@ pub struct DassParser<T: Clone + Display + Eq> {
 }
 
 impl<T: Clone + Display + Eq> DassParser<T> {
-    pub fn new(tokens: Vec<TokenData<T>>) -> DassParser<T> {
+    pub fn new(mut tokens: Vec<TokenData<T>>) -> DassParser<T> {
+        // reverse tokens so we can use `last` and `pop` methods
+        tokens.reverse();
         DassParser { tokens }
     }
     pub fn eof(&self) -> bool {
         self.tokens.len() == 0
     }
     pub fn la1(&self, tag: T) -> bool {
-        if self.eof() {
-            return false;
+        match self.tokens.last() {
+            Some(t) => t.tag == tag,
+            _ => false,
         }
-        self.tokens[0].tag == tag
     }
     pub fn match_token(&mut self, tag: T) -> Result<TokenData<T>, DassParserError<T>> {
         if self.eof() {
