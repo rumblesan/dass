@@ -10,6 +10,20 @@ pub enum DassParserError<T: Clone + Display + Eq> {
     UnexpectedToken { expected: T, found: TokenData<T> },
 }
 
+impl<T: Clone + Display + Eq> std::fmt::Display for DassParserError<T> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match &self {
+            DassParserError::UnexpectedEndOfFile => write!(f, "Unexpected End of File"),
+            DassParserError::UnexpectedEndOfStream => write!(f, "Unexpected End of Stream"),
+            DassParserError::UnexpectedToken { expected, found } => write!(
+                f,
+                "Unexpected Token: expected: {} but found {}",
+                expected, found
+            ),
+        }
+    }
+}
+
 pub struct DassParser<T: Clone + Display + Eq> {
     tokens: Vec<TokenData<T>>,
 }
