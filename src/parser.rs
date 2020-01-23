@@ -4,7 +4,7 @@ use std::result::Result;
 
 use super::tokens::TokenData;
 
-pub enum ParserError<T: Clone + Display + Eq> {
+pub enum DassParserError<T: Clone + Display + Eq> {
     UnexpectedEndOfFile,
     UnexpectedEndOfStream,
     UnexpectedToken { expected: T, found: TokenData<T> },
@@ -27,23 +27,23 @@ impl<T: Clone + Display + Eq> DassParser<T> {
         }
         self.tokens[0].tag == tag
     }
-    pub fn match_token(&mut self, tag: T) -> Result<TokenData<T>, ParserError<T>> {
+    pub fn match_token(&mut self, tag: T) -> Result<TokenData<T>, DassParserError<T>> {
         if self.eof() {
-            return Err(ParserError::UnexpectedEndOfFile);
+            return Err(DassParserError::UnexpectedEndOfFile);
         }
         let t = self.tokens.pop().unwrap();
         if t.tag != tag {
-            return Err(ParserError::UnexpectedToken {
+            return Err(DassParserError::UnexpectedToken {
                 expected: tag,
                 found: t,
             });
         }
         Ok(t)
     }
-    pub fn pop_token(&mut self) -> Result<TokenData<T>, ParserError<T>> {
+    pub fn pop_token(&mut self) -> Result<TokenData<T>, DassParserError<T>> {
         match self.tokens.pop() {
             Some(t) => Ok(t),
-            None => Err(ParserError::UnexpectedEndOfStream),
+            None => Err(DassParserError::UnexpectedEndOfStream),
         }
     }
 }
