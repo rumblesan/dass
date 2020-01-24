@@ -1,3 +1,17 @@
+use std::fmt::{Display, Formatter, Result};
+
+#[derive(Debug)]
+pub struct StreamPosition {
+    pub line: u64,
+    pub character: u64,
+}
+
+impl Display for StreamPosition {
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        write!(f, "char {} on line {}", self.character, self.line)
+    }
+}
+
 pub struct PositionTracker {
     pub line: u64,
     pub character: u64,

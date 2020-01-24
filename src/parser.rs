@@ -2,27 +2,8 @@ use std::cmp::Eq;
 use std::fmt::Display;
 use std::result::Result;
 
+use super::error::ParserError;
 use super::tokens::TokenData;
-
-pub enum DassParserError<T: Clone + Display + Eq> {
-    UnexpectedEndOfFile,
-    UnexpectedEndOfStream,
-    UnexpectedToken { expected: T, found: TokenData<T> },
-}
-
-impl<T: Clone + Display + Eq> std::fmt::Display for DassParserError<T> {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        match &self {
-            DassParserError::UnexpectedEndOfFile => write!(f, "Unexpected End of File"),
-            DassParserError::UnexpectedEndOfStream => write!(f, "Unexpected End of Stream"),
-            DassParserError::UnexpectedToken { expected, found } => write!(
-                f,
-                "Unexpected Token: expected: {} but found {}",
-                expected, found
-            ),
-        }
-    }
-}
 
 pub struct DassParser<T: Clone + Display + Eq> {
     tokens: Vec<TokenData<T>>,
@@ -43,23 +24,24 @@ impl<T: Clone + Display + Eq> DassParser<T> {
             _ => false,
         }
     }
-    pub fn match_token(&mut self, tag: T) -> Result<TokenData<T>, DassParserError<T>> {
+    pub fn match_token(&mut self, tag: T) -> Result<TokenData<T>, ParserError> {
         if self.eof() {
-            return Err(DassParserError::UnexpectedEndOfFile);
+            return Err(ParserError::end_of_stream(tag));
         }
         let t = self.tokens.pop().unwrap();
         if t.tag != tag {
-            return Err(DassParserError::UnexpectedToken {
-                expected: tag,
-                found: t,
-            });
+            return Err(ParserError::unexpected_token(tag, t));
         }
         Ok(t)
     }
-    pub fn pop_token(&mut self) -> Result<TokenData<T>, DassParserError<T>> {
+    pub fn pop_token(&mut self) -> Result<TokenData<T>, ParserError> {
         match self.tokens.pop() {
             Some(t) => Ok(t),
-            None => Err(DassParserError::UnexpectedEndOfStream),
+            None => Err(ParserError::new(
+                String::from("To Pop token"),
+                String::from("End of Stream"),
+                None,
+            )),
         }
     }
 }

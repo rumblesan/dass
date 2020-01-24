@@ -1,5 +1,7 @@
 use regex::Regex;
-use std::fmt::Display;
+use std::fmt::{Display, Formatter, Result};
+
+use super::position_tracker::StreamPosition;
 
 #[derive(Debug)]
 pub struct TokenData<T: Clone + Display> {
@@ -9,8 +11,17 @@ pub struct TokenData<T: Clone + Display> {
     pub character: u64,
 }
 
-impl<T: Clone + Display> std::fmt::Display for TokenData<T> {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+impl<T: Clone + Display> TokenData<T> {
+    pub fn position(&self) -> StreamPosition {
+        StreamPosition {
+            line: self.line,
+            character: self.character,
+        }
+    }
+}
+
+impl<T: Clone + Display> Display for TokenData<T> {
+    fn fmt(&self, f: &mut Formatter) -> Result {
         write!(
             f,
             "({} at l{}.{} :: {})",
