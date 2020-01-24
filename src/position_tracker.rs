@@ -34,4 +34,10 @@ impl PositionTracker {
             }
         }
     }
+    pub fn position(&self) -> StreamPosition {
+        StreamPosition {
+            line: self.line,
+            character: self.character,
+        }
+    }
 }
