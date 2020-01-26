@@ -30,6 +30,7 @@ impl<T: Clone + Display> Display for TokenData<T> {
     }
 }
 
+#[derive(Clone, Debug)]
 pub struct TokenMatcher<T: Clone + Display> {
     pub regex: Regex,
     pub tag: T,

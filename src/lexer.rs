@@ -4,52 +4,76 @@ use super::error::ParserError;
 use super::position_tracker::PositionTracker;
 use super::tokens::{TokenData, TokenMatcher};
 
-pub struct DassLexer<T: Clone + Display> {
+pub struct DassLexerBuilder<T>
+where
+    T: Clone + Display,
+{
     matchers: Vec<TokenMatcher<T>>,
 }
 
-pub struct LexerResults<T: Clone + Display> {
-    pub tokens: Vec<TokenData<T>>,
-    pub errors: Vec<ParserError>,
+impl<T> DassLexerBuilder<T>
+where
+    T: Clone + Display,
+{
+    pub fn new(matchers: Vec<TokenMatcher<T>>) -> Self {
+        DassLexerBuilder { matchers }
+    }
+    pub fn build<'a>(&self, source: &'a str) -> DassLexer<'a, T> {
+        DassLexer {
+            matchers: self.matchers.clone(),
+            tracker: PositionTracker::new(),
+            source,
+        }
+    }
 }
 
-impl<T: Clone + Display> DassLexer<T> {
-    pub fn create(matchers: Vec<TokenMatcher<T>>) -> DassLexer<T> {
-        DassLexer { matchers }
-    }
-    pub fn tokenise(&self, input: &str) -> LexerResults<T> {
-        let mut tracker = PositionTracker::new();
-        let mut source = input;
-        let mut result = LexerResults {
-            tokens: Vec::new(),
-            errors: Vec::new(),
-        };
-        while source.len() > 0 {
+pub struct DassLexer<'a, T>
+where
+    T: Clone + Display,
+{
+    matchers: Vec<TokenMatcher<T>>,
+    tracker: PositionTracker,
+    source: &'a str,
+}
+
+impl<'a, T> Iterator for DassLexer<'a, T>
+where
+    T: Clone + Display,
+{
+    type Item = Result<TokenData<T>, ParserError>;
+    fn next(&mut self) -> Option<Self::Item> {
+        loop {
+            if self.source.len() < 1 {
+                return None;
+            }
             let mut matched = false;
+
             for matcher in &self.matchers {
-                if matcher.regex.is_match(&source) {
+                if matcher.regex.is_match(&self.source) {
                     matched = true;
-                    let m = matcher.regex.find(&source).unwrap();
+                    let m = matcher.regex.find(&self.source).unwrap();
                     let s = m.as_str();
+                    self.tracker.consume(s);
+                    self.source = &self.source[s.len()..];
                     if !matcher.skip {
-                        let t = matcher.parse(s, tracker.line, tracker.character);
-                        result.tokens.push(t);
+                        return Some(Ok(matcher.parse(
+                            s,
+                            self.tracker.line,
+                            self.tracker.character,
+                        )));
                     }
-                    tracker.consume(s);
-                    source = &source[s.len()..];
                 }
             }
+
             if !matched {
-                tracker.consume(&source[..1]);
-                source = &source[1..];
-                result.errors.push(ParserError::new(
+                self.tracker.consume(&self.source[..1]);
+                self.source = &self.source[1..];
+                return Some(Err(ParserError::new(
                     String::from("lexing match"),
-                    String::from(source),
-                    Some(tracker.position()),
-                ));
-                println!("Matching Error!");
+                    String::from(self.source),
+                    Some(self.tracker.position()),
+                )));
             }
         }
-        return result;
     }
 }
