@@ -3,7 +3,7 @@ use std::fmt::{Display, Formatter, Result};
 
 use super::position_tracker::StreamPosition;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct TokenData<T: Clone + Display> {
     pub tag: T,
     pub contents: String,
