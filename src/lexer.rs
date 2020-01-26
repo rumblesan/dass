@@ -9,8 +9,8 @@ pub struct DassLexer<T: Clone + Display> {
 }
 
 pub struct LexerResults<T: Clone + Display> {
-    tokens: Vec<TokenData<T>>,
-    errors: Vec<ParserError>,
+    pub tokens: Vec<TokenData<T>>,
+    pub errors: Vec<ParserError>,
 }
 
 impl<T: Clone + Display> DassLexer<T> {
