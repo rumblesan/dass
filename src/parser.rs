@@ -11,10 +11,10 @@ pub struct DassParser<T>
 where
     T: Clone + Display,
 {
-    tokens: Peekable<IntoIter<T>>,
+    tokens: Peekable<IntoIter<TokenData<T>>>,
 }
 
-impl<T> DassParser<TokenData<T>>
+impl<T> DassParser<T>
 where
     T: Clone + Display + Eq,
 {
