@@ -23,26 +23,22 @@ where
             tokens: tokens.into_iter().peekable(),
         }
     }
-    pub fn eof(&self) -> bool {
-        self.tokens.len() == 0
+    pub fn eof(&mut self) -> bool {
+        self.tokens.peek().is_none()
     }
     pub fn la1(&mut self, tag: T) -> bool {
-        match self.tokens.peek() {
-            Some(t) => t.tag == tag,
-            _ => false,
-        }
+        self.tokens.peek().map_or(false, |t| t.tag == tag)
     }
     pub fn match_token(&mut self, tag: T) -> Result<TokenData<T>, ParserError> {
-        match self.tokens.next() {
-            None => Err(ParserError::end_of_stream(tag)),
-            Some(t) => {
+        self.tokens
+            .next()
+            .map_or(Err(ParserError::end_of_stream(&tag)), |t| {
                 if t.tag != tag {
-                    return Err(ParserError::unexpected_token(tag, t));
+                    Err(ParserError::unexpected_token(tag, t))
                 } else {
-                    return Ok(t);
+                    Ok(t)
                 }
-            }
-        }
+            })
     }
     pub fn pop_token(&mut self) -> Result<TokenData<T>, ParserError> {
         self.tokens.next().ok_or(ParserError::new(
