@@ -53,26 +53,30 @@ where
                     matched = true;
                     let m = matcher.regex.find(&self.source).unwrap();
                     let s = m.as_str();
-                    self.tracker.consume(s);
                     self.source = &self.source[s.len()..];
                     if !matcher.skip {
-                        return Some(Ok(matcher.parse(
+                        let res = Some(Ok(matcher.parse(
                             s,
                             self.tracker.line,
                             self.tracker.character,
                         )));
+                        self.tracker.consume(s);
+                        return res;
+                    } else {
+                        self.tracker.consume(s);
                     }
                 }
             }
 
             if !matched {
-                self.tracker.consume(&self.source[..1]);
                 self.source = &self.source[1..];
-                return Some(Err(ParserError::new(
+                let err = Some(Err(ParserError::new(
                     String::from("lexing match"),
                     String::from(self.source),
                     Some(self.tracker.position()),
                 )));
+                self.tracker.consume(&self.source[..1]);
+                return err;
             }
         }
     }
