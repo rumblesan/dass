@@ -1,6 +1,6 @@
 [package]
 name = "dass"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Guy John <guy@rumblesan.com>"]
 edition = "2018"
 description = "A helper library for creating recursive descent parsers"
