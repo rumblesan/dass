@@ -70,13 +70,14 @@ where
             }
 
             if !matched {
-                self.source = &self.source[1..];
+                let c = &self.source[..1];
                 let err = Some(Err(ParserError::new(
                     String::from("lexing match"),
-                    String::from(self.source),
+                    c.to_owned(),
                     Some(self.tracker.position()),
                 )));
-                self.tracker.consume(&self.source[..1]);
+                self.source = &self.source[1..];
+                self.tracker.consume(c);
                 return err;
             }
         }
