@@ -27,6 +27,7 @@ where
     }
 }
 
+#[derive(Clone)]
 pub struct DassLexer<'a, T>
 where
     T: Clone + Display,

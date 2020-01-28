@@ -12,6 +12,7 @@ impl Display for StreamPosition {
     }
 }
 
+#[derive(Clone)]
 pub struct PositionTracker {
     pub line: u64,
     pub character: u64,
