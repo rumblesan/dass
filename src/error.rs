@@ -31,14 +31,14 @@ impl ParserError {
             position,
         }
     }
-    pub fn end_of_stream<T: Display>(expected: T) -> Self {
+    pub fn end_of_stream<T: Display>(expected: &T) -> Self {
         ParserError {
             expected: format!("{}", expected),
             found: String::from("End of Stream"),
             position: None,
         }
     }
-    pub fn unexpected_token<T: Display + Clone>(expected: T, found: TokenData<T>) -> Self {
+    pub fn unexpected_token<T: Display + Clone>(expected: &T, found: TokenData<T>) -> Self {
         ParserError {
             expected: format!("{}", expected),
             found: String::from("End of Stream"),

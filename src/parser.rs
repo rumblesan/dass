@@ -14,11 +14,21 @@ where
 {
     fn eof(&mut self) -> bool;
 
-    fn la1(&mut self, tag: T) -> bool;
+    fn la1(&mut self, tag: &T) -> bool;
 
-    fn match_token(&mut self, tag: T) -> Result<TokenData<T>, ParserError>;
+    fn match_token(&mut self, tag: &T) -> Result<TokenData<T>, ParserError>;
 
     fn pop_token(&mut self) -> Result<TokenData<T>, ParserError>;
+
+    fn pop_until(&mut self, tag: &T) -> Result<TokenData<T>, ParserError> {
+        while !self.la1(tag) {
+            let t = self.pop_token();
+            if t.is_err() {
+                return t;
+            }
+        }
+        self.pop_token()
+    }
 }
 
 pub struct DassVecStreamTokenParser<T>
@@ -46,14 +56,14 @@ where
     fn eof(&mut self) -> bool {
         self.tokens.peek().is_none()
     }
-    fn la1(&mut self, tag: T) -> bool {
-        self.tokens.peek().map_or(false, |t| t.tag == tag)
+    fn la1(&mut self, tag: &T) -> bool {
+        self.tokens.peek().map_or(false, |t| t.tag == *tag)
     }
-    fn match_token(&mut self, tag: T) -> Result<TokenData<T>, ParserError> {
+    fn match_token(&mut self, tag: &T) -> Result<TokenData<T>, ParserError> {
         self.tokens
             .next()
             .map_or(Err(ParserError::end_of_stream(&tag)), |t| {
-                if t.tag != tag {
+                if t.tag != *tag {
                     Err(ParserError::unexpected_token(tag, t))
                 } else {
                     Ok(t)
@@ -94,18 +104,18 @@ where
     fn eof(&mut self) -> bool {
         self.lexer.peek().is_none()
     }
-    fn la1(&mut self, tag: T) -> bool {
+    fn la1(&mut self, tag: &T) -> bool {
         self.lexer.peek().map_or(false, |res| match res {
             Err(_) => false,
-            Ok(t) => t.tag == tag,
+            Ok(t) => t.tag == *tag,
         })
     }
-    fn match_token(&mut self, tag: T) -> Result<TokenData<T>, ParserError> {
+    fn match_token(&mut self, tag: &T) -> Result<TokenData<T>, ParserError> {
         self.lexer
             .next()
-            .map_or(Err(ParserError::end_of_stream(&tag)), |res| {
+            .map_or(Err(ParserError::end_of_stream(tag)), |res| {
                 res.and_then(|t| {
-                    if t.tag != tag {
+                    if t.tag != *tag {
                         Err(ParserError::unexpected_token(tag, t))
                     } else {
                         Ok(t)
