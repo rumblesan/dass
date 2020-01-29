@@ -8,7 +8,7 @@ pub struct StreamPosition {
 
 impl Display for StreamPosition {
     fn fmt(&self, f: &mut Formatter) -> Result {
-        write!(f, "char {} on line {}", self.character, self.line)
+        write!(f, "column {} on line {}", self.character, self.line)
     }
 }
 

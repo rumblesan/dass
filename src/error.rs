@@ -41,7 +41,7 @@ impl ParserError {
     pub fn unexpected_token<T: Display + Clone>(expected: &T, found: TokenData<T>) -> Self {
         ParserError {
             expected: format!("{}", expected),
-            found: String::from("End of Stream"),
+            found: format!("{}", found.tag),
             position: Some(found.position()),
         }
     }
